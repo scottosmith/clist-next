@@ -18,8 +18,8 @@ export default async function handler(req, res) {
     const [area, cat, query] = params;
     const url = `https://${area}.craigslist.org/search/${cat}?query=${query}&hasPic=1`;
     const response = await fetch(url);
-    const text = await response.text();
-    res.status(200).json({ html: text });
+    const html = await response.text();
+    res.status(200).json({ html });
   } catch (error) {
     throw error;
   }

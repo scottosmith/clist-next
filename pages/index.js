@@ -3,10 +3,11 @@ import { useState } from "react";
 
 function Index() {
   const [searchResults, setSearchResults] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
 
   const fetchData = async () => {
-    const req = await fetch("/api/search/stlouis/pho/nikon");
-    const newData = await req.json();
+    const response = await fetch(`/api/search/stlouis/pho/${searchValue}`);
+    const newData = await response.json();
 
     if (newData) {
       let parser = new DOMParser();
@@ -41,10 +42,6 @@ function Index() {
               </span>
               <a href={postUrl}>{title}</a>
             </div>
-            // <img
-            //   key={imgIds[0].slice(2)}
-            //   src={`https://images.craigslist.org/${imgIds[0].slice(2)}_300x300.jpg`}
-            // />
           );
         });
         setSearchResults(htmlResults);
@@ -54,6 +51,11 @@ function Index() {
 
   return (
     <>
+      <input
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        type="text"
+      />
       <button onClick={fetchData}>Get Data</button>
       {searchResults ? searchResults.map((result) => result) : <p>nothing</p>}
     </>

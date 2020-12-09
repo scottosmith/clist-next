@@ -1,10 +1,10 @@
-import Cors from "cors";
-import initMiddleware from "../../../lib/init-middleware";
+import Cors from 'cors';
+import initMiddleware from '../../../lib/init-middleware';
 
 const cors = initMiddleware(
   Cors({
-    methods: ["GET"],
-    origin: true,
+    methods: ['GET'],
+    origin: true
   })
 );
 
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   try {
     await cors(req, res);
     const {
-      query: { params },
+      query: { params }
     } = req;
 
     const [area, cat, query] = params;

@@ -9,6 +9,7 @@
   "dependencies": {
     "cors": "2.8.5",
     "dom-parser": "^0.1.6",
+    "firebase": "^8.1.2",
     "next": "latest",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

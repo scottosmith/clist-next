@@ -1,4 +1,4 @@
-import { AuthProvider } from '../lib/auth';
+import { AuthProvider } from '@/lib/auth';
 
 const App = ({ Component, pageProps }) => {
   return (

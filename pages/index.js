@@ -1,6 +1,6 @@
 import DOMParser from 'dom-parser';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { useAuth } from '../lib/auth';
 
@@ -8,9 +8,42 @@ export default function Index() {
   const auth = useAuth();
   const [searchResults, setSearchResults] = useState(null);
   const [searchValue, setSearchValue] = useState('');
+  const [areas, setAreas] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedArea, setSelectedArea] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-  const fetchData = async () => {
-    const response = await fetch(`/api/search/stlouis/pho/${searchValue}`);
+  const getAreas = useCallback(async () => {
+    try {
+      const response = await fetch('/api/areas');
+      const data = await response.json();
+
+      setAreas(data.areas);
+    } catch (error) {
+      throw error;
+    }
+  }, [setAreas]);
+
+  const getCategories = useCallback(async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+
+      setCategories(data.categories);
+    } catch (error) {
+      throw error;
+    }
+  }, [setCategories]);
+
+  useEffect(() => {
+    getAreas();
+    getCategories();
+  }, [getAreas, getCategories]);
+
+  const getResults = async () => {
+    const response = await fetch(
+      `/api/search/${selectedArea}/${selectedCategory}/${searchValue}`
+    );
     const newData = await response.json();
 
     if (newData) {
@@ -50,19 +83,57 @@ export default function Index() {
             </div>
           );
         });
-        setSearchResults(htmlResults);
+        return htmlResults;
       }
     }
   };
 
+  const searchCL = async () => {
+    if (!selectedArea.length) return window.alert('Please select an area!');
+    if (!selectedCategory.length)
+      return window.alert('Please select a category!');
+    if (!searchValue) return;
+
+    const results = await getResults(searchValue);
+    setSearchResults(results);
+  };
+
   return (
     <>
+      <select
+        onChange={e => setSelectedArea(e.target.value)}
+        value={selectedArea}
+      >
+        <option key="no-area-selected" value="">
+          Select an Area
+        </option>
+        {areas &&
+          areas.map(area => (
+            <option key={area.AreaID} value={area.Hostname}>
+              {area.ShortDescription} - {area.Region}
+            </option>
+          ))}
+      </select>
+      <select
+        onChange={e => setSelectedCategory(e.target.value)}
+        value={selectedCategory}
+      >
+        <option key="no-cat-selected" value="">
+          Select a Category
+        </option>
+        {categories &&
+          categories.map(category => (
+            <option key={category.CategoryID} value={category.Abbreviation}>
+              {category.Description}
+            </option>
+          ))}
+      </select>
       <input
         value={searchValue}
         onChange={e => setSearchValue(e.target.value)}
         type="text"
       />
-      <button onClick={fetchData}>Get Data</button>
+      <button onClick={searchCL}>Get Data</button>
       {auth.user ? (
         <div>
           <p>Email: {auth.user.email}</p>

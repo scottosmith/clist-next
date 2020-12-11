@@ -1,10 +1,10 @@
-import DOMParser from 'dom-parser';
 import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
 
 import { useAuth } from '@/lib/auth';
 import AreaSelector from '@/components/search/AreaSelector';
 import CategorySelector from '@/components/search/CategorySelector';
+import { getLists, createList } from '@/lib/db';
 
 export default function Index() {
   const auth = useAuth();
@@ -12,6 +12,7 @@ export default function Index() {
   const [searchValue, setSearchValue] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [listName, setListName] = useState('');
 
   const getResults = async () => {
     const response = await fetch(
@@ -26,7 +27,7 @@ export default function Index() {
 
       let results = [];
       for (let match of htmlByClass[0].childNodes) {
-        if (match.nodeName === 'li') {
+        if (match.nodeName === 'LI') {
           results.push(match);
         }
       }
@@ -71,6 +72,23 @@ export default function Index() {
     setSearchResults(results);
   };
 
+  const getAllLists = useCallback(async () => {
+    await getLists();
+  });
+
+  const addList = name => {
+    const newList = {
+      userId: auth.user.uid,
+      createdAt: new Date().toISOString(),
+      name
+    };
+    createList(newList);
+  };
+
+  useEffect(() => {
+    getAllLists();
+  }, [getAllLists]);
+
   return (
     <>
       <AreaSelector
@@ -87,6 +105,14 @@ export default function Index() {
         type="text"
       />
       <button onClick={searchCL}>Get Data</button>
+      <div>
+        <input
+          value={listName}
+          onChange={e => setListName(e.target.value)}
+          type="text"
+        />
+        <button onClick={() => addList(listName)}>Add List</button>
+      </div>
       {auth.user ? (
         <div>
           <p>Email: {auth.user.email}</p>

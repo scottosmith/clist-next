@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import Head from 'next/head';
+
 import { useEffect, useState, useCallback } from 'react';
 
 import { useAuth } from '@/lib/auth';
 import AreaSelector from '@/components/search/AreaSelector';
 import CategorySelector from '@/components/search/CategorySelector';
-import { getLists, createList } from '@/lib/db';
+import { createList } from '@/lib/db';
 
 export default function Index() {
   const auth = useAuth();
@@ -13,6 +15,7 @@ export default function Index() {
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [listName, setListName] = useState('');
+  const [allLists, setAllLists] = useState([]);
 
   const getResults = async () => {
     const response = await fetch(
@@ -72,9 +75,20 @@ export default function Index() {
     setSearchResults(results);
   };
 
-  const getAllLists = useCallback(async () => {
-    await getLists();
-  });
+  const getAllUserLists = useCallback(async () => {
+    if (!auth.loading) {
+      const response = await fetch(`/api/lists`, {
+        method: 'GET',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          token: auth.user.token
+        }),
+        credentials: 'same-origin'
+      });
+      const data = await response.json();
+      setAllLists(data.lists);
+    }
+  }, [auth.loading]);
 
   const addList = name => {
     const newList = {
@@ -86,11 +100,14 @@ export default function Index() {
   };
 
   useEffect(() => {
-    getAllLists();
-  }, [getAllLists]);
+    getAllUserLists();
+  }, [getAllUserLists]);
 
   return (
     <>
+      <Head>
+        <title>cList</title>
+      </Head>
       <AreaSelector
         selectedArea={selectedArea}
         setSelectedArea={setSelectedArea}
@@ -112,6 +129,21 @@ export default function Index() {
           type="text"
         />
         <button onClick={() => addList(listName)}>Add List</button>
+      </div>
+      <div>
+        <select>
+          <option value="no-value" key="no-value">
+            --- Choose a List ---
+          </option>
+          {allLists &&
+            allLists.map(list => {
+              return (
+                <option key={list.id} value={list.name}>
+                  {list.name}
+                </option>
+              );
+            })}
+        </select>
       </div>
       {auth.user ? (
         <div>

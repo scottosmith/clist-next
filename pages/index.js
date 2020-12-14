@@ -1,150 +1,29 @@
-import Link from 'next/link';
 import Head from 'next/head';
-
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 
 import { useAuth } from '@/lib/auth';
-import AreaSelector from '@/components/search/AreaSelector';
-import CategorySelector from '@/components/search/CategorySelector';
-import { createList } from '@/lib/db';
+import Search from '@/containers/Search';
+import Lists from '@/containers/Lists';
 
 export default function Index() {
   const auth = useAuth();
-  const [searchResults, setSearchResults] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedArea, setSelectedArea] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [listName, setListName] = useState('');
-  const [allLists, setAllLists] = useState([]);
 
-  const getResults = async () => {
-    const response = await fetch(
-      `/api/search/${selectedArea}/${selectedCategory}/${searchValue}`
-    );
-    const newData = await response.json();
-
-    if (newData) {
-      let parser = new DOMParser();
-      const html = parser.parseFromString(newData.html, 'text/html');
-      const htmlByClass = html.getElementsByClassName('rows');
-
-      let results = [];
-      for (let match of htmlByClass[0].childNodes) {
-        if (match.nodeName === 'LI') {
-          results.push(match);
-        }
-      }
-
-      if (results.length) {
-        const htmlResults = results.map(result => {
-          const imgIds = result.childNodes[1].attributes[2].value.split(',');
-          const imgUrl = `https://images.craigslist.org/${imgIds[0].slice(
-            2
-          )}_300x300.jpg`;
-          const title = result.getElementsByClassName('result-title hdrlnk')[0]
-            .innerHTML;
-          const price = result.getElementsByClassName('result-price')[0]
-            .innerHTML;
-          const postUrl = result.getElementsByClassName(
-            'result-image gallery'
-          )[0].attributes[0].value;
-          return (
-            <div key={Math.random()}>
-              <img src={imgUrl} />
-              <span>
-                <Link href={postUrl} passHref>
-                  <a>{title}</a>
-                </Link>{' '}
-                - {price}
-              </span>
-            </div>
-          );
-        });
-        return htmlResults;
-      }
-    }
-  };
-
-  const searchCL = async () => {
-    if (!selectedArea.length) return window.alert('Please select an area!');
-    if (!selectedCategory.length)
-      return window.alert('Please select a category!');
-    if (!searchValue.length) return;
-
-    const results = await getResults(searchValue);
-    setSearchResults(results);
-  };
-
-  const getAllUserLists = useCallback(async () => {
-    if (!auth.loading) {
-      const response = await fetch(`/api/lists`, {
-        method: 'GET',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          token: auth.user.token
-        }),
-        credentials: 'same-origin'
-      });
-      const data = await response.json();
-      setAllLists(data.lists);
-    }
-  }, [auth.loading]);
-
-  const addList = name => {
-    const newList = {
-      userId: auth.user.uid,
-      createdAt: new Date().toISOString(),
-      name
-    };
-    createList(newList);
-  };
-
-  useEffect(() => {
-    getAllUserLists();
-  }, [getAllUserLists]);
+  const [selectedListId, setSelectedListId] = useState('no-list-selected');
 
   return (
     <>
       <Head>
         <title>cList</title>
       </Head>
-      <AreaSelector
-        selectedArea={selectedArea}
-        setSelectedArea={setSelectedArea}
+      <Lists
+        selectedListId={selectedListId}
+        setSelectedListId={setSelectedListId}
       />
-      <CategorySelector
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+      <Search
+        selectedListId={selectedListId}
+        setSelectedListId={setSelectedListId}
       />
-      <input
-        value={searchValue}
-        onChange={e => setSearchValue(e.target.value)}
-        type="text"
-      />
-      <button onClick={searchCL}>Get Data</button>
-      <div>
-        <input
-          value={listName}
-          onChange={e => setListName(e.target.value)}
-          type="text"
-        />
-        <button onClick={() => addList(listName)}>Add List</button>
-      </div>
-      <div>
-        <select>
-          <option value="no-value" key="no-value">
-            --- Choose a List ---
-          </option>
-          {allLists &&
-            allLists.map(list => {
-              return (
-                <option key={list.id} value={list.name}>
-                  {list.name}
-                </option>
-              );
-            })}
-        </select>
-      </div>
+
       {auth.user ? (
         <div>
           <p>Email: {auth.user.email}</p>
@@ -156,7 +35,6 @@ export default function Index() {
           <button onClick={() => auth.signinWithGoogle()}>Google SignIn</button>
         </>
       )}
-      {searchResults && searchResults.map(result => result)}
     </>
   );
 }

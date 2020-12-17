@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 
-const CategorySelector = ({ selectedCategory, setSelectedCategory }) => {
+const CategorySelector = forwardRef((props, ref) => {
   const [categories, setCategories] = useState([]);
 
-  const getCategories = useCallback(async () => {
+  const getCategories = async () => {
     try {
       const response = await fetch('/api/categories');
       const data = await response.json();
@@ -12,17 +12,14 @@ const CategorySelector = ({ selectedCategory, setSelectedCategory }) => {
     } catch (error) {
       throw error;
     }
-  }, [setCategories]);
+  };
 
   useEffect(() => {
     getCategories();
-  }, [getCategories]);
+  }, []);
 
   return (
-    <select
-      onChange={e => setSelectedCategory(e.target.value)}
-      value={selectedCategory}
-    >
+    <select ref={ref}>
       <option key="no-cat-selected" value="">
         Select a Category
       </option>
@@ -34,6 +31,6 @@ const CategorySelector = ({ selectedCategory, setSelectedCategory }) => {
         ))}
     </select>
   );
-};
+});
 
 export default CategorySelector;

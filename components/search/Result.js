@@ -13,7 +13,6 @@ const Result = ({
 }) => {
   // handles adding a result to a list
   const addResult = async () => {
-    console.log(selectedListId);
     // must have a list selected!
     if (selectedListId === 'no-list-selected') {
       window.alert('Please Select A List!');
@@ -29,8 +28,7 @@ const Result = ({
       }
     };
     try {
-      const response = await createResult(resultData, selectedListId);
-      console.log(response);
+      await createResult(resultData, selectedListId);
     } catch (error) {
       throw error;
     }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import AreaSelector from '@/components/search/AreaSelector';
 import CategorySelector from '@/components/search/CategorySelector';
@@ -7,15 +7,15 @@ import SearchResults from '@/components/search/SearchResults';
 
 const Search = ({ selectedListId }) => {
   const [searchResults, setSearchResults] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedArea, setSelectedArea] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const searchValue = useRef('');
+  const selectedArea = useRef('');
+  const selectedCategory = useRef('');
 
   const getResults = async () => {
     try {
       const results = [];
       const response = await fetch(
-        `/api/search/${selectedArea}/${selectedCategory}/${searchValue}`
+        `/api/search/${selectedArea.current.value}/${selectedCategory.current.value}/${searchValue.current.value}`
       );
       const newData = await response.json();
 
@@ -37,31 +37,21 @@ const Search = ({ selectedListId }) => {
   };
 
   const searchCL = async () => {
-    if (!selectedArea.length) return window.alert('Please select an area!');
-    if (!selectedCategory.length)
+    if (!selectedArea.current.value.length)
+      return window.alert('Please select an area!');
+    if (!selectedCategory.current.value.length)
       return window.alert('Please select a category!');
-    if (!searchValue.length) return;
+    if (!searchValue.current.value.length) return;
 
-    const results = await getResults(searchValue);
-    console.log(results);
+    const results = await getResults();
     setSearchResults(results);
   };
 
   return (
     <>
-      <AreaSelector
-        selectedArea={selectedArea}
-        setSelectedArea={setSelectedArea}
-      />
-      <CategorySelector
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
-      <SearchInput
-        value={searchValue}
-        changed={setSearchValue}
-        search={searchCL}
-      />
+      <AreaSelector ref={selectedArea} />
+      <CategorySelector ref={selectedCategory} />
+      <SearchInput ref={searchValue} search={searchCL} />
       {searchResults && (
         <SearchResults
           results={searchResults}

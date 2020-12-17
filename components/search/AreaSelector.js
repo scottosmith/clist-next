@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 
-const AreaSelector = ({ selectedArea, setSelectedArea }) => {
+const AreaSelector = forwardRef((props, ref) => {
   const [areas, setAreas] = useState([]);
 
-  const getAreas = useCallback(async () => {
+  const getAreas = async () => {
     try {
       const response = await fetch('/api/areas');
       const data = await response.json();
@@ -12,17 +12,14 @@ const AreaSelector = ({ selectedArea, setSelectedArea }) => {
     } catch (error) {
       throw error;
     }
-  }, [setAreas]);
+  };
 
   useEffect(() => {
     getAreas();
-  }, [getAreas]);
+  }, []);
 
   return (
-    <select
-      onChange={e => setSelectedArea(e.target.value)}
-      value={selectedArea}
-    >
+    <select ref={ref}>
       <option key="no-area-selected" value="">
         Select an Area
       </option>
@@ -34,6 +31,6 @@ const AreaSelector = ({ selectedArea, setSelectedArea }) => {
         ))}
     </select>
   );
-};
+});
 
 export default AreaSelector;

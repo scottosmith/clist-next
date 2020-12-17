@@ -1,23 +1,23 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 
 import { createList } from '@/lib/db';
 import { useAuth } from '@/lib/auth';
 
 const AddList = ({ addNewList }) => {
-  const [listName, setListName] = useState('');
+  const listName = useRef('');
   const auth = useAuth();
 
   const keyPressHandler = async e => {
     if (e.which === 13) {
       e.preventDefault();
-      await addList(newListName);
+      await addList();
     }
   };
 
   const addList = async name => {
     const newList = {
       userId: auth.user.uid,
-      name
+      name: listName.current.value
     };
     const response = await createList(newList);
     const newListWithId = {
@@ -25,18 +25,13 @@ const AddList = ({ addNewList }) => {
       id: response.id
     };
     addNewList(newListWithId);
-    setListName('');
+    listName.current.value = '';
   };
 
   return (
     <div>
-      <input
-        value={listName}
-        onChange={e => setListName(e.target.value)}
-        type="text"
-        onKeyPress={keyPressHandler}
-      />
-      <button onClick={() => addList(listName)}>Add List</button>
+      <input ref={listName} type="text" onKeyPress={keyPressHandler} />
+      <button onClick={() => addList()}>Add List</button>
     </div>
   );
 };

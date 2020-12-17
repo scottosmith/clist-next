@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import ChooseList from '@/components/lists/ChooseList';
 import AddList from '@/components/lists/AddList';
@@ -11,7 +11,7 @@ const Lists = ({ selectedListId, setSelectedListId }) => {
   const addNewListToState = list =>
     setAllLists(allLists => [...allLists, list]);
 
-  const getAllUserLists = useCallback(async () => {
+  const getAllUserLists = async () => {
     if (!auth.loading) {
       const response = await fetch(`/api/lists`, {
         method: 'GET',
@@ -22,24 +22,20 @@ const Lists = ({ selectedListId, setSelectedListId }) => {
         credentials: 'same-origin'
       });
       const data = await response.json();
-      setAllLists(data.lists);
+      const sortedLists = data.lists.sort((a, b) => (a.name > b.name ? 1 : -1));
+      setAllLists(sortedLists);
     }
-  }, [auth.loading]);
+  };
 
   useEffect(() => {
     getAllUserLists();
-  }, [getAllUserLists]);
-
-  const sortedLists = useMemo(
-    () => allLists.sort((a, b) => (a.name > b.name ? 1 : -1)),
-    [allLists]
-  );
+  }, [auth.loading]);
 
   return (
     <>
       <AddList addNewList={addNewListToState} />
       <ChooseList
-        allLists={sortedLists}
+        allLists={allLists}
         selectedListId={selectedListId}
         setSelectedListId={setSelectedListId}
       />

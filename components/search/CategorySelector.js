@@ -1,4 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
+import { Select } from '@chakra-ui/react';
 
 const CategorySelector = forwardRef((props, ref) => {
   const [categories, setCategories] = useState([]);
@@ -19,7 +20,7 @@ const CategorySelector = forwardRef((props, ref) => {
   }, []);
 
   return (
-    <select ref={ref}>
+    <Select ref={ref} variant="outline" size="md" tabIndex="2" fontSize="sm">
       <option key="no-cat-selected" value="">
         Select a Category
       </option>
@@ -29,7 +30,7 @@ const CategorySelector = forwardRef((props, ref) => {
             {category.Description}
           </option>
         ))}
-    </select>
+    </Select>
   );
 });
 

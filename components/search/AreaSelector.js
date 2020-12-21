@@ -1,4 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
+import { Select } from '@chakra-ui/react';
 
 const AreaSelector = forwardRef((props, ref) => {
   const [areas, setAreas] = useState([]);
@@ -19,7 +20,7 @@ const AreaSelector = forwardRef((props, ref) => {
   }, []);
 
   return (
-    <select ref={ref}>
+    <Select ref={ref} variant="outline" size="md" tabIndex="1" fontSize="sm">
       <option key="no-area-selected" value="">
         Select an Area
       </option>
@@ -29,7 +30,7 @@ const AreaSelector = forwardRef((props, ref) => {
             {area.ShortDescription} - {area.Region}
           </option>
         ))}
-    </select>
+    </Select>
   );
 });
 

@@ -1,4 +1,6 @@
 import { useState, useRef } from 'react';
+import { Box, VStack, IconButton, useColorMode } from '@chakra-ui/react';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import AreaSelector from '@/components/search/AreaSelector';
 import CategorySelector from '@/components/search/CategorySelector';
@@ -6,6 +8,7 @@ import SearchInput from '@/components/search/SearchInput';
 import SearchResults from '@/components/search/SearchResults';
 
 const Search = ({ selectedListId }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   const [searchResults, setSearchResults] = useState(null);
   const searchValue = useRef('');
   const selectedArea = useRef('');
@@ -47,18 +50,37 @@ const Search = ({ selectedListId }) => {
     setSearchResults(results);
   };
 
+  const submitSearch = e => {
+    if (e.which === 13) {
+      e.preventDefault();
+      searchCL();
+    }
+  };
+
   return (
-    <>
-      <AreaSelector ref={selectedArea} />
-      <CategorySelector ref={selectedCategory} />
-      <SearchInput ref={searchValue} search={searchCL} />
-      {searchResults && (
-        <SearchResults
-          results={searchResults}
-          selectedListId={selectedListId}
-        />
-      )}
-    </>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+      flexDirection="column"
+      onKeyPress={submitSearch}
+    >
+      <VStack spacing="1rem" w="24rem" p="1rem">
+        <IconButton onClick={toggleColorMode}>
+          {colorMode === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </IconButton>
+        <AreaSelector ref={selectedArea} />
+        <CategorySelector ref={selectedCategory} />
+        <SearchInput ref={searchValue} search={searchCL} />
+        {searchResults && (
+          <SearchResults
+            results={searchResults}
+            selectedListId={selectedListId}
+          />
+        )}
+      </VStack>
+    </Box>
   );
 };
 

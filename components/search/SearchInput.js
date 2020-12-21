@@ -1,20 +1,24 @@
 import { forwardRef } from 'react';
+import { Input, Button, Text } from '@chakra-ui/react';
 
 const SearchInput = forwardRef(({ search }, ref) => {
-  const submitSearch = e => {
-    if (e.which === 13) {
-      e.preventDefault();
-      search();
-    }
-  };
-
   return (
-    <main onKeyPress={submitSearch}>
-      <input ref={ref} tabIndex="1" />
-      <h1>
-        Search <button onClick={search}>CraigsList</button>
-      </h1>
-    </main>
+    <>
+      <Input fontSize="xl" ref={ref} tabIndex="3" padding="1.5rem" />
+      <Text fontSize="4xl" fontWeight="bold">
+        Search{' '}
+        <Button
+          onClick={search}
+          fontSize="4xl"
+          tabIndex="4"
+          colorScheme="purple"
+          size="lg"
+          padding="1.75rem"
+        >
+          cList
+        </Button>
+      </Text>
+    </>
   );
 });
 

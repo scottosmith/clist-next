@@ -1,4 +1,5 @@
 import { createResult } from '@/lib/db';
+import { Box } from '@chakra-ui/react';
 
 const Result = ({
   id,
@@ -35,7 +36,7 @@ const Result = ({
   };
 
   return (
-    <div tabIndex={tab}>
+    <Box w="30%" tabIndex={tab}>
       <a href={postUrl} target="_blank" rel="noopener noreferrer">
         <div>
           <img src={imgUrl} />
@@ -47,7 +48,7 @@ const Result = ({
       <div onClick={mode === 'add' ? addResult : () => removeResult(id)}>
         {mode === 'add' ? 'Add to' : 'Remove from'} List
       </div>
-    </div>
+    </Box>
   );
 };
 

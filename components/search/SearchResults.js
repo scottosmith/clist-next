@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Flex } from '@chakra-ui/react';
 
 import Result from '@/components/search/Result';
 
@@ -41,7 +42,11 @@ const SearchResults = ({ results, selectedListId }) => {
     }
   }, [results]);
 
-  return <div>{mappedResults}</div>;
+  return (
+    <Flex direction="row" wrap="wrap" justify="space-between" w="80%">
+      {mappedResults}
+    </Flex>
+  );
 };
 
 export default SearchResults;

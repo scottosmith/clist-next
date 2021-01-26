@@ -73,13 +73,13 @@ const Search = ({ selectedListId }) => {
         <AreaSelector ref={selectedArea} />
         <CategorySelector ref={selectedCategory} />
         <SearchInput ref={searchValue} search={searchCL} />
-        {searchResults && (
-          <SearchResults
-            results={searchResults}
-            selectedListId={selectedListId}
-          />
-        )}
       </VStack>
+      {searchResults && (
+        <SearchResults
+          results={searchResults}
+          selectedListId={selectedListId}
+        />
+      )}
     </Box>
   );
 };

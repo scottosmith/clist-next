@@ -1,5 +1,5 @@
 import { createResult } from '@/lib/db';
-import { Box } from '@chakra-ui/react';
+import { Flex, Box, Image, VStack } from '@chakra-ui/react';
 
 const Result = ({
   id,
@@ -36,18 +36,27 @@ const Result = ({
   };
 
   return (
-    <Box w="30%" tabIndex={tab}>
-      <a href={postUrl} target="_blank" rel="noopener noreferrer">
-        <div>
-          <img src={imgUrl} />
-        </div>
-        <div>
-          <span>{title}</span> - <span>{price}</span>
-        </div>
-      </a>
-      <div onClick={mode === 'add' ? addResult : () => removeResult(id)}>
-        {mode === 'add' ? 'Add to' : 'Remove from'} List
-      </div>
+    <Box w="350px" h="350px" m="1" border="1px solid black" tabIndex={tab}>
+      <Flex w="100%" direction="column" justify="space-between" align="stretch">
+        <a href={postUrl} target="_blank" rel="noopener noreferrer">
+          <Box w="100%">
+            <Image src={imgUrl} w="100%" />
+          </Box>
+          <Box p="1">
+            <span>{title}</span> - <span>{price}</span>
+          </Box>
+        </a>
+        <Box
+          style={{ bottom: '0' }}
+          bg="purple.500"
+          color="white"
+          fontSize="1rem"
+          onClick={mode === 'add' ? addResult : () => removeResult(id)}
+          w="100%"
+        >
+          {mode === 'add' ? 'Add to' : 'Remove from'} List
+        </Box>
+      </Flex>
     </Box>
   );
 };
